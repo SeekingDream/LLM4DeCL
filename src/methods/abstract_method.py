@@ -1,5 +1,4 @@
 
-
 class AbstractMethod:
     def __init__(self, train_data, val_data, test_data, config):
         self.train_data = train_data
