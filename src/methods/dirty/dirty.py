@@ -13,9 +13,10 @@ import torch
 
 
 class DirtyMethod(AbstractMethod):
-    def __init__(self, config, dirty_config, extra_config, ckpt):
-        super().__init__(config)
-        self.dirty_config = json.loads(_jsonnet.evaluate_file(dirty_config))
+    def __init__(self, train_set, dev_set, test_set, config, dirty_config, extra_config = None, ckpt = None):
+        super().__init__(train_set, dev_set, test_set, config)
+        dirty_config = json.loads(_jsonnet.evaluate_file(dirty_config))
+        self.dirty_config = dirty_config
         if extra_config:
             extra_config = json.loads(extra_config)
             dirty_config = util.update(dirty_config, extra_config)

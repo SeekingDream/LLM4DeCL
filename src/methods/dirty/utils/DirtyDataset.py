@@ -26,7 +26,7 @@ class DirtyDataset(torch.utils.data.Dataset):
         self.huggingface_dataSet = dataset.shuffle(seed=42).select(range(int(len(dataset)*percent)))
         if config:
             # annotate example for training
-            from vocab import Vocab
+            from src.methods.dirty.utils.vocab import Vocab
 
             self.vocab = Vocab.load(config["vocab_file"])
             with open(config["typelib_file"]) as type_f:
@@ -133,7 +133,7 @@ class DirtyDataset(torch.utils.data.Dataset):
                 if isinstance(loc, Register):
                     return 1030 + self.vocab.regs[loc.name]
                 else:
-                    from vocab import VocabEntry
+                    from src.methods.dirty.utils.vocab import VocabEntry
 
                     return (
                         3 + stack_start_pos - loc.offset

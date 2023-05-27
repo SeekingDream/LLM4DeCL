@@ -1,15 +1,13 @@
 {
   "data": {
-    "train_file": "../data/train-shard-*.tar",
-    "dev_file": "../data/dev-*.tar",
-    "test_file": "../data/test.tar",
-    "vocab_file": "../data/vocab.bpe10000",
-    "typelib_file": "../data/typelib.json",
+    "train_file": "methods/dirty/data/train-shard-*.tar",
+    "dev_file": "methods/dirty/data/dev-*.tar",
+    "test_file": "methods/dirty/data/test-*.tar",
+    "vocab_file": "methods/dirty/data/vocab.bpe10000",
+    "typelib_file": "methods/dirty/data/typelib.json",
     "max_src_tokens_len": 510,
     "max_num_var": 32,
     "retype": true,
-    "rename": true,
-    "interleave": true,
   },
   "encoder":{
     "type": "XfmrSequentialEncoder",
@@ -21,9 +19,9 @@
     "num_heads": 8,
   },
   "decoder": {
-    "type": if $['data'].interleave then 'XfmrInterleaveDecoder' else 'XfmrDecoder',
+    "type": 'XfmrDecoder',
     "vocab_file": $['data'].vocab_file,
-    "typelib_file": "../data/typelib.json",
+    "typelib_file": "methods/dirty/data/typelib.json",
     "target_embedding_size": $['encoder'].source_embedding_size,
     "hidden_size": $['encoder'].hidden_size,
     "dropout": 0.1,
@@ -54,7 +52,7 @@
     "check_val_every_n_epoch": 1,
   },
   "test": {
-    "pred_file": "pred_mt.json",
+    "pred_file": "pred_retype.json",
     "batch_size": 64,
     "beam_size": 5,
   }

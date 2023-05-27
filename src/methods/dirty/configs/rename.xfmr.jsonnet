@@ -1,13 +1,14 @@
 {
   "data": {
-    "train_file": "../data/train-shard-*.tar",
-    "dev_file": "../data/dev-*.tar",
-    "test_file": "../data/test.tar",
-    "vocab_file": "../data/vocab.bpe10000",
-    "typelib_file": "../data/typelib.json",
+    "train_file": "methods/dirty/data/train-shard-*.tar",
+    "dev_file": "methods/dirty/data/dev-*.tar",
+    "test_file": "methods/dirty/data/test.tar",
+    "vocab_file": "methods/dirty/data/vocab.bpe10000",
+    "typelib_file": "methods/dirty/data/typelib.json",
     "max_src_tokens_len": 510,
     "max_num_var": 32,
-    "retype": true,
+    "retype": false,
+    "rename": true,
   },
   "encoder":{
     "type": "XfmrSequentialEncoder",
@@ -21,7 +22,7 @@
   "decoder": {
     "type": 'XfmrDecoder',
     "vocab_file": $['data'].vocab_file,
-    "typelib_file": "../data/typelib.json",
+    "typelib_file": "methods/dirty/data/typelib.json",
     "target_embedding_size": $['encoder'].source_embedding_size,
     "hidden_size": $['encoder'].hidden_size,
     "dropout": 0.1,
@@ -42,6 +43,7 @@
     "type": 'SimpleDecoder',
     "vocab_file": $['data'].vocab_file,
     "hidden_size": $['mem_encoder'].hidden_size,
+    "rename": true,
   },
   "train": {
     "batch_size": 16,
@@ -52,7 +54,7 @@
     "check_val_every_n_epoch": 1,
   },
   "test": {
-    "pred_file": "pred_retype.json",
+    "pred_file": "pred_mt.json",
     "batch_size": 64,
     "beam_size": 5,
   }
