@@ -41,6 +41,8 @@ class DirtyMethod(AbstractMethod):
             pin_memory=True,
         )
 
+        wandb_logger = WandbLogger(name=config['exp_name'], project="dire", log_model=True)
+        wandb_logger.log_hyperparams(config)
         # model
         self.model = TypeReconstructionModel(dirty_config)
         self.ckpt = ckpt
@@ -50,6 +52,7 @@ class DirtyMethod(AbstractMethod):
             resume_from_checkpoint = None
         self.trainer = pl.Trainer(
             max_epochs=dirty_config["train"]["max_epoch"],
+            logger=wandb_logger,
             gpus=1 if config['cuda'] else None,
             auto_select_gpus=True,
             gradient_clip_val=1,
