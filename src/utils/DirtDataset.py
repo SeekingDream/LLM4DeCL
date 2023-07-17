@@ -1,21 +1,26 @@
+import os.path
+
+import torch
 import json
 from typing import Dict, List, Mapping, Optional, Set, Tuple, Union
-from src.utils.variable import Location, Variable, location_from_json_key, Register, Stack
-from src.utils.dire_types import Struct, TypeLibCodec, TypeLib, UDT, TypeInfo, Disappear
-from src.utils.code_processing import tokenize_raw_code
-from src.utils.function import CollectedFunction, Function
-class Example:
+from src.utils.dirt.variable import Location, Variable, location_from_json_key, Register, Stack
+from src.utils.dirt.dire_types import Struct, TypeLibCodec, TypeLib, UDT, TypeInfo, Disappear
+from src.utils.dirt.code_processing import tokenize_raw_code
+from src.utils.dirt.function import CollectedFunction, Function
+
+
+class DirtExample:
     def __init__(
-        self,
-        name: str,
-        code_tokens: str,
-        source: Mapping[Location, Set[Variable]],
-        target: Mapping[Location, Set[Variable]],
-        binary_file: str = "",
-        valid: bool = True,
-        raw_code: str = "",
-        test_meta: Dict[str, Dict[str, bool]] = None,
-        binary: str = None,
+            self,
+            name: str,
+            code_tokens: str,
+            source: Mapping[Location, Set[Variable]],
+            target: Mapping[Location, Set[Variable]],
+            binary_file: str = "",
+            valid: bool = True,
+            raw_code: str = "",
+            test_meta: Dict[str, Dict[str, bool]] = None,
+            binary: str = None,
     ):
         self.name = name
         self.code_tokens = code_tokens
@@ -79,8 +84,8 @@ class Example:
         source_code_tokens_set = set(code_tokens)
         target_code_tokens_set = set(tokenize_raw_code(cf.debug.raw_code))
 
-        source = Example.filter(source, source_code_tokens_set)
-        target = Example.filter(target, target_code_tokens_set, set(source.keys()))
+        source = DirtExample.filter(source, source_code_tokens_set)
+        target = DirtExample.filter(target, target_code_tokens_set, set(source.keys()))
 
         # Assign type "Disappear" to variables not existing in the ground truth
         varnames = set()
@@ -107,9 +112,9 @@ class Example:
 
     @staticmethod
     def filter(
-        mapping: Mapping[Location, Set[Variable]],
-        code_tokens: Optional[Set[str]] = None,
-        locations: Optional[Set[Location]] = None,
+            mapping: Mapping[Location, Set[Variable]],
+            code_tokens: Optional[Set[str]] = None,
+            locations: Optional[Set[Location]] = None,
     ) -> Mapping[Location, Variable]:
         """Discard and leave these for future work:
 
@@ -141,3 +146,17 @@ def identity(x):
 
 def get_src_len(e):
     return e.source_seq_length
+
+
+class DirtDataset(torch.utils.data.Dataset):
+    SHUFFLE_BUFFER = 5000
+    SORT_BUFFER = 512
+
+    def __init__(self, dataset, percent: float = 1.0):
+        self.huggingface_dataSet = dataset.shuffle(seed=42).select(range(int(len(dataset) * percent)))
+
+    def __len__(self):
+        return len(self.huggingface_dataSet)
+
+    def __getitem__(self, idx):
+        return DirtExample.from_dataline(self.huggingface_dataSet[idx])
